@@ -37,17 +37,17 @@ def play():
 ButtonWindow = Frame(root,borderwidth=1)
 ButtonWindow.pack(fill="both", expand=True)
 
-playbutton = Button(ButtonWindow,text="Play",font=("Montserrat",14,"bold"),command=play,width=40)
-playbutton.grid(row=0,column=0,columnspan=2,padx=(45,0))
+playbutton = Button(ButtonWindow,text="Play",font=("Montserrat",14,"bold"),command=play,width=25,background="#27e152",fg="white",borderwidth=0, relief='raised')
+playbutton.grid(row=0,column=0,columnspan=2,padx=(25,0),pady=(20,0))
 
-statsbutton = Button(ButtonWindow,text="Stats",width=40)
-statsbutton.grid(row=1,column=0,columnspan=2,padx=(45,0))
+statsbutton = Button(ButtonWindow,text="Stats",font=("Montserrat",14,"bold"),width=25,background="#27aae1",fg="white",borderwidth=0, relief='raised')
+statsbutton.grid(row=1,column=0,columnspan=2,padx=(25,0),pady=(10,0))
 
-settings = Button(ButtonWindow,text="Settings")
-settings.grid(row=2,column=0)
+settings = Button(ButtonWindow,text="Settings",font=("Montserrat",14,"bold"),width=12,background="#27aae1",fg="white",borderwidth=0, relief='raised')
+settings.grid(row=2,column=0,padx=(21,0),pady=10)
 
-quit = Button(ButtonWindow,text="Quit",command=quit)
-quit.grid(row=2,column=1)
+quit = Button(ButtonWindow,text="Quit",command=quit,font=("Montserrat",14,"bold"),width=11,background="#ff5757",fg="white",borderwidth=0, relief='raised')
+quit.grid(row=2,column=1,padx=(12,0),pady=10)
 
 
 
