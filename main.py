@@ -1,15 +1,16 @@
 from tkinter import *
 from PIL import ImageTk,Image
-from tkinter import messagebox
-from os import system
+import requests,json
+import random
 
 root = Tk()
 root.title("Hangman")
 root.iconbitmap("icons/hangman.ico")
 
+category = ["noun", "verb", "adjective", "adverb"]
+
 logo_large = (Image.open("icons/hangman.ico")).resize((100,100))
 logo = ImageTk.PhotoImage(logo_large)
-
 
 top_frame = Frame(root)
 top_frame.pack(side="top", fill="both", expand=True)
@@ -31,6 +32,12 @@ Slogan = Label(LogoText,text="Can you save the poor soul?",font=("Montserrat",12
 Slogan.grid(row=1,column=0)
 
 def play():
+    global category
+    random_word = random.choice(category)
+    api_req = requests.get("https://api.api-ninjas.com/v1/randomword?type="+random_word, headers={'X-Api-Key': 'l203bJ+LLJJR4qvW9AJtHg==28WMMOp820Oi9cAx'})
+    api = json.loads(api_req.content) 
+
+    print(api,random_word)
     pass
 
 
