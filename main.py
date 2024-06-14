@@ -33,12 +33,31 @@ Slogan.grid(row=1,column=0)
 
 def play():
     global category
-    random_word = random.choice(category)
-    api_req = requests.get("https://api.api-ninjas.com/v1/randomword?type="+random_word, headers={'X-Api-Key': 'l203bJ+LLJJR4qvW9AJtHg==28WMMOp820Oi9cAx'})
-    api = json.loads(api_req.content) 
-
-    print(api,random_word)
-    pass
+    final_category = random.choice(category)
+    
+    api_req = requests.get("https://api.api-ninjas.com/v1/randomword?type="+final_category, headers={'X-Api-Key': 'l203bJ+LLJJR4qvW9AJtHg==28WMMOp820Oi9cAx'})
+    api = json.loads(api_req.content)
+    
+    word = api['word']
+    len_word = len(word)
+    
+    
+    game_window = Toplevel()
+    
+    hidden_word = ""
+    for j in range(len_word):
+        hidden_word += "_ "
+        
+    word_label = Label(game_window,text=hidden_word+"\n"+final_category)
+    word_label.grid(row=0,column=0)
+    
+    for i in range(26):
+        letter = chr(ord('A') + i)
+        locals()["button_"+letter] = Button(game_window,text=letter)
+    
+    
+    
+    
 
 
 ButtonWindow = Frame(root,borderwidth=1)
