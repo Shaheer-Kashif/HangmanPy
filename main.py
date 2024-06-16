@@ -43,17 +43,23 @@ def play():
     
     
     game_window = Toplevel()
+    upperframe = LabelFrame(game_window)
+    upperframe.grid(row=0,column=0)
     
     hidden_word = ""
+    
     for j in range(len_word):
         hidden_word += "_ "
         
-    word_label = Label(game_window,text=hidden_word+"\n"+final_category)
+    word_label = Label(upperframe,text=hidden_word+"\n"+final_category)
     word_label.grid(row=0,column=0)
     
+    keyboard = LabelFrame(game_window)
+    keyboard.grid(row=1,column=0)
     for i in range(26):
         letter = chr(ord('A') + i)
-        locals()["button_"+letter] = Button(game_window,text=letter)
+        locals()["button_"+letter] = Button(keyboard,text=letter)
+        locals()["button_"+letter].grid(row=i//8,column=i%8)
     
     
     
