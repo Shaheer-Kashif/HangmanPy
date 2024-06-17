@@ -31,14 +31,24 @@ GameName.grid(row=0,column=0)
 Slogan = Label(LogoText,text="Can you save the poor soul?",font=("Montserrat",12))
 Slogan.grid(row=1,column=0)
 
+def wordcheck(letter):
+    global word,word_label,hidden_word
+    if letter in word:
+        pos = word.index(letter)
+        hidden_word = hidden_word.replace(hidden_word[pos],word[pos]) # fix this as its replacing all underscores...
+        word_label.config(text=hidden_word)
+    
+    
+
 def play():
-    global category
+    global category,hidden_word,word,word_label
     final_category = random.choice(category)
     
     api_req = requests.get("https://api.api-ninjas.com/v1/randomword?type="+final_category, headers={'X-Api-Key': 'l203bJ+LLJJR4qvW9AJtHg==28WMMOp820Oi9cAx'})
     api = json.loads(api_req.content)
     
     word = api['word']
+    print(word)
     len_word = len(word)
     
     
@@ -47,18 +57,20 @@ def play():
     upperframe.grid(row=0,column=0)
     
     hidden_word = ""
-    
     for j in range(len_word):
-        hidden_word += "_ "
+        hidden_word += "_"
         
-    word_label = Label(upperframe,text=hidden_word+"\n"+final_category)
+    word_label = Label(upperframe,text=hidden_word)
     word_label.grid(row=0,column=0)
+    
+    category_label = Label(upperframe,text=final_category)
+    category_label.grid(row=1,column=0)
     
     keyboard = LabelFrame(game_window)
     keyboard.grid(row=1,column=0)
     for i in range(26):
         letter = chr(ord('A') + i)
-        locals()["button_"+letter] = Button(keyboard,text=letter)
+        locals()["button_"+letter] = Button(keyboard,text=letter,command=lambda le = letter.lower(): wordcheck(le))
         locals()["button_"+letter].grid(row=i//8,column=i%8)
     
     
