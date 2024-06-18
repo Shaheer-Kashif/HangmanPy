@@ -31,12 +31,13 @@ GameName.grid(row=0,column=0)
 Slogan = Label(LogoText,text="Can you save the poor soul?",font=("Montserrat",12))
 Slogan.grid(row=1,column=0)
 
-def wordcheck(letter):
+def wordcheck(guessed_letter):
     global word,word_label,hidden_word
-    if letter in word:
-        pos = word.index(letter)
-        hidden_word = hidden_word.replace(hidden_word[pos],word[pos]) # fix this as its replacing all underscores...
-        word_label.config(text=hidden_word)
+    
+    for index,letter in enumerate(word):
+        if guessed_letter==letter:
+            hidden_word[index] = word[index] 
+    word_label.config(text=hidden_word)
     
     
 
@@ -47,18 +48,17 @@ def play():
     api_req = requests.get("https://api.api-ninjas.com/v1/randomword?type="+final_category, headers={'X-Api-Key': 'l203bJ+LLJJR4qvW9AJtHg==28WMMOp820Oi9cAx'})
     api = json.loads(api_req.content)
     
-    word = api['word']
+    word = [x for x in api['word']]
     print(word)
-    len_word = len(word)
     
     
     game_window = Toplevel()
     upperframe = LabelFrame(game_window)
     upperframe.grid(row=0,column=0)
     
-    hidden_word = ""
-    for j in range(len_word):
-        hidden_word += "_"
+    hidden_word = []
+    for j in word:
+        hidden_word.append("_")
         
     word_label = Label(upperframe,text=hidden_word)
     word_label.grid(row=0,column=0)
