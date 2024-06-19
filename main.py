@@ -48,17 +48,14 @@ def play():
     api_req = requests.get("https://api.api-ninjas.com/v1/randomword?type="+final_category, headers={'X-Api-Key': 'l203bJ+LLJJR4qvW9AJtHg==28WMMOp820Oi9cAx'})
     api = json.loads(api_req.content)
     
-    word = [x for x in api['word']]
+    word = [x for x in api['word'][0]]
     print(word)
-    
-    
+
     game_window = Toplevel()
     upperframe = LabelFrame(game_window)
     upperframe.grid(row=0,column=0)
     
-    hidden_word = []
-    for j in word:
-        hidden_word.append("_")
+    hidden_word = ["_" for letter in word]
         
     word_label = Label(upperframe,text=hidden_word)
     word_label.grid(row=0,column=0)
