@@ -2,6 +2,7 @@ from tkinter import *
 from PIL import ImageTk,Image
 import requests,json
 import random
+from tkinter import messagebox
 
 root = Tk()
 root.title("Hangman")
@@ -32,17 +33,28 @@ Slogan = Label(LogoText,text="Can you save the poor soul?",font=("Montserrat",12
 Slogan.grid(row=1,column=0)
 
 def wordcheck(guessed_letter):
-    global word,word_label,hidden_word
-    
-    for index,letter in enumerate(word):
-        if guessed_letter==letter:
-            hidden_word[index] = word[index] 
-    word_label.config(text=hidden_word)
+    global lives,word,hidden_word,word_label,game_window
+    if guessed_letter in word:
+        for index,letter in enumerate(word):
+            if guessed_letter==letter.lower():
+                hidden_word[index] = word[index] 
+        word_label.config(text=hidden_word)
+    else:
+        if lives == 1:
+            messagebox.showerror("Game Over","All the Lives are lost!")
+            game_window.destroy()
+            
+            
+            
+        
+        lives -= 1
+        lives_label.config(text="Lives: "+str(lives))
+        
     
     
 
 def play():
-    global category,hidden_word,word,word_label
+    global lives,category,hidden_word,word,word_label,lives_label,game_window
     final_category = random.choice(category)
     
     api_req = requests.get("https://api.api-ninjas.com/v1/randomword?type="+final_category, headers={'X-Api-Key': 'l203bJ+LLJJR4qvW9AJtHg==28WMMOp820Oi9cAx'})
@@ -50,18 +62,24 @@ def play():
     
     word = [x for x in api['word'][0]]
     print(word)
-
+    
+    lives = 5
+    
     game_window = Toplevel()
-    upperframe = LabelFrame(game_window)
+    upperframe = LabelFrame(game_window,width=500,height=200)
     upperframe.grid(row=0,column=0)
     
     hidden_word = ["_" for letter in word]
         
-    word_label = Label(upperframe,text=hidden_word)
+    word_label = Label(upperframe,text=hidden_word,font=("Montserrat",18,"bold"))
     word_label.grid(row=0,column=0)
     
-    category_label = Label(upperframe,text=final_category)
+    category_label = Label(upperframe,text="Category: "+final_category)
     category_label.grid(row=1,column=0)
+    
+    lives_label = Label(upperframe,text="Lives: "+str(lives))
+    lives_label.grid(row=2,column=0)
+    
     
     keyboard = LabelFrame(game_window)
     keyboard.grid(row=1,column=0)
