@@ -39,13 +39,13 @@ def wordcheck(guessed_letter):
             if guessed_letter==letter.lower():
                 hidden_word[index] = word[index] 
         word_label.config(text=hidden_word)
+        if hidden_word == word:
+            messagebox.showinfo("Congratulations","You guessed the word correctly!")
+            game_window.destroy()
     else:
         if lives == 1:
             messagebox.showerror("Game Over","All the Lives are lost!")
             game_window.destroy()
-            
-            
-            
         
         lives -= 1
         lives_label.config(text="Lives: "+str(lives))
@@ -66,7 +66,7 @@ def play():
     lives = 5
     
     game_window = Toplevel()
-    upperframe = LabelFrame(game_window,width=500,height=200)
+    upperframe = LabelFrame(game_window,width=600,height=200)
     upperframe.grid(row=0,column=0)
     
     hidden_word = ["_" for letter in word]
