@@ -8,6 +8,11 @@ root = Tk()
 root.title("Hangman")
 root.iconbitmap("icons/hangman.ico")
 
+category_v1 = requests.get("https://www.wordgamedb.com/api/v1/categories")
+category_v1cont = json.loads(category_v1.content)
+
+print(category_v1cont)
+
 category = ["noun", "verb", "adjective", "adverb"]
 
 logo_large = (Image.open("icons/hangman.ico")).resize((100,100))
@@ -34,11 +39,13 @@ Slogan.grid(row=1,column=0)
 
 def wordcheck(guessed_letter):
     global lives,word,hidden_word,word_label,game_window
+    globals()["button_"+guessed_letter].config(state=DISABLED)
     if guessed_letter in word:
         for index,letter in enumerate(word):
-            if guessed_letter==letter.lower():
+            if guessed_letter==letter:
                 hidden_word[index] = word[index] 
         word_label.config(text=hidden_word)
+        
         if hidden_word == word:
             messagebox.showinfo("Congratulations","You guessed the word correctly!")
             game_window.destroy()
@@ -51,10 +58,8 @@ def wordcheck(guessed_letter):
         lives_label.config(text="Lives: "+str(lives))
         
     
-    
-
 def play():
-    global lives,category,hidden_word,word,word_label,lives_label,game_window
+    global lives,category,hidden_word,word,word_label,lives_label,game_window,keyboard
     final_category = random.choice(category)
     
     api_req = requests.get("https://api.api-ninjas.com/v1/randomword?type="+final_category, headers={'X-Api-Key': 'l203bJ+LLJJR4qvW9AJtHg==28WMMOp820Oi9cAx'})
@@ -84,9 +89,9 @@ def play():
     keyboard = LabelFrame(game_window)
     keyboard.grid(row=1,column=0)
     for i in range(26):
-        letter = chr(ord('A') + i)
-        locals()["button_"+letter] = Button(keyboard,text=letter,command=lambda le = letter.lower(): wordcheck(le))
-        locals()["button_"+letter].grid(row=i//8,column=i%8)
+        letter = chr(ord('a') + i)
+        globals()["button_"+letter] = Button(keyboard,text=letter.upper(),command=lambda le = letter: wordcheck(le),width=5)
+        globals()["button_"+letter].grid(row=i//8,column=i%8)
     
     
     
