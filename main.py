@@ -8,12 +8,9 @@ root = Tk()
 root.title("Hangman")
 root.iconbitmap("icons/hangman.ico")
 
-category_v1 = requests.get("https://www.wordgamedb.com/api/v1/categories")
-category_v1cont = json.loads(category_v1.content)
+category = requests.get("https://www.wordgamedb.com/api/v1/categories")
+category = json.loads(category.content)
 
-print(category_v1cont)
-
-category = ["noun", "verb", "adjective", "adverb"]
 
 logo_large = (Image.open("icons/hangman.ico")).resize((100,100))
 logo = ImageTk.PhotoImage(logo_large)
@@ -46,7 +43,7 @@ def wordcheck(guessed_letter):
                 hidden_word[index] = word[index] 
         word_label.config(text=hidden_word)
         
-        if hidden_word == word:
+        if "".join(hidden_word) == word:
             messagebox.showinfo("Congratulations","You guessed the word correctly!")
             game_window.destroy()
     else:
@@ -62,11 +59,10 @@ def play():
     global lives,category,hidden_word,word,word_label,lives_label,game_window,keyboard
     final_category = random.choice(category)
     
-    api_req = requests.get("https://api.api-ninjas.com/v1/randomword?type="+final_category, headers={'X-Api-Key': 'l203bJ+LLJJR4qvW9AJtHg==28WMMOp820Oi9cAx'})
+    api_req = requests.get("https://www.wordgamedb.com/api/v1/words/?category="+final_category)
     api = json.loads(api_req.content)
-    
-    word = [x for x in api['word'][0]]
-    print(word)
+    word = api[0]['word']
+    hint = api[0]['hint']
     
     lives = 5
     
@@ -84,6 +80,9 @@ def play():
     
     lives_label = Label(upperframe,text="Lives: "+str(lives))
     lives_label.grid(row=2,column=0)
+    
+    hint_label = Label(upperframe,text="Hint: "+hint)
+    hint_label.grid(row=3,column=0)
     
     
     keyboard = LabelFrame(game_window)
