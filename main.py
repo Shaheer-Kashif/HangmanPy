@@ -90,7 +90,7 @@ def play():
     for i in range(26):
         letter = chr(ord('a') + i)
         globals()["button_"+letter] = Button(keyboard,text=letter.upper(),command=lambda le = letter: wordcheck(le),width=5)
-        globals()["button_"+letter].grid(row=i//8,column=i%8)
+        globals()["button_"+letter].grid(row=i//7,column=i%7)
     
     
     
