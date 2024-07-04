@@ -3,14 +3,11 @@ from PIL import ImageTk,Image
 import requests,json
 import random
 from tkinter import messagebox
+from tkvideo
 
 root = Tk()
 root.title("Hangman")
 root.iconbitmap("icons/hangman.ico")
-
-category = requests.get("https://www.wordgamedb.com/api/v1/categories")
-category = json.loads(category.content)
-
 
 logo_large = (Image.open("icons/hangman.ico")).resize((100,100))
 logo = ImageTk.PhotoImage(logo_large)
@@ -57,6 +54,10 @@ def wordcheck(guessed_letter):
     
 def play():
     global lives,category,hidden_word,word,word_label,lives_label,game_window,keyboard
+    
+    category = requests.get("https://www.wordgamedb.com/api/v1/categories")
+    category = json.loads(category.content)
+    
     final_category = random.choice(category)
     
     api_req = requests.get("https://www.wordgamedb.com/api/v1/words/?category="+final_category)
@@ -67,8 +68,12 @@ def play():
     lives = 5
     
     game_window = Toplevel()
+    
+    hangman = LabelFrame(game_window,width=600,height=200)
+    hangman.grid(row=0,column=0)
+    
     upperframe = LabelFrame(game_window,width=600,height=200)
-    upperframe.grid(row=0,column=0)
+    upperframe.grid(row=0,column=1)
     
     hidden_word = ["_" for letter in word]
         
@@ -76,7 +81,7 @@ def play():
     word_label.grid(row=0,column=0)
     
     category_label = Label(upperframe,text="Category: "+final_category)
-    category_label.grid(row=1,column=0)
+    category_label.grid(row=1,column=1)
     
     lives_label = Label(upperframe,text="Lives: "+str(lives))
     lives_label.grid(row=2,column=0)
