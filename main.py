@@ -3,17 +3,18 @@ from PIL import ImageTk,Image
 import requests,json
 import random
 from tkinter import messagebox
-from tkvideo
+# from tkvideo
 
 root = Tk()
 root.title("Hangman")
 root.iconbitmap("icons/hangman.ico")
 
-logo_large = (Image.open("icons/hangman.ico")).resize((100,100))
-logo = ImageTk.PhotoImage(logo_large)
+logo = ImageTk.PhotoImage(Image.open("icons/hangman.ico").resize((100,100)))
 
 top_frame = Frame(root)
 top_frame.pack(side="top", fill="both", expand=True)
+
+default_image = ImageTk.PhotoImage(Image.open("media/default.png").resize((200,200)))
 
 LogoWindow = Frame(top_frame,borderwidth=0)
 LogoWindow.pack(side="left")
@@ -31,6 +32,30 @@ GameName.grid(row=0,column=0)
 Slogan = Label(LogoText,text="Can you save the poor soul?",font=("Montserrat",12))
 Slogan.grid(row=1,column=0)
 
+def animate1(path):
+    global showAnimation,imageObject,frames
+    openImage = Image.open(path)
+    frames = openImage.n_frames
+    
+    imageObject = [PhotoImage(file=path,format=f"gif -index {i}") for i in range(frames)]
+    
+    count = 0
+    
+    showAnimation = None
+    animate2(count)
+    
+    
+def animate2(count):
+    global showAnimation
+    newImage = imageObject[count]
+    
+    image_placeholder.configure(image=newImage)
+    count += 1
+    
+    if count != frames:
+        showAnimation = root.after(50, lambda: animate2(count))
+    
+    
 def wordcheck(guessed_letter):
     global lives,word,hidden_word,word_label,game_window
     globals()["button_"+guessed_letter].config(state=DISABLED)
@@ -47,13 +72,13 @@ def wordcheck(guessed_letter):
         if lives == 1:
             messagebox.showerror("Game Over","All the Lives are lost!")
             game_window.destroy()
-        
+        animate1("media/"+str(6-(lives-1))+".gif")
         lives -= 1
         lives_label.config(text="Lives: "+str(lives))
         
     
 def play():
-    global lives,category,hidden_word,word,word_label,lives_label,game_window,keyboard
+    global lives,category,hidden_word,word,word_label,lives_label,game_window,keyboard,default_image,image_placeholder
     
     category = requests.get("https://www.wordgamedb.com/api/v1/categories")
     category = json.loads(category.content)
@@ -62,15 +87,19 @@ def play():
     
     api_req = requests.get("https://www.wordgamedb.com/api/v1/words/?category="+final_category)
     api = json.loads(api_req.content)
-    word = api[0]['word']
-    hint = api[0]['hint']
+    random_ele = random.randrange(len(api))
+    word = api[random_ele]['word']
+    hint = api[random_ele]['hint']
     
-    lives = 5
+    lives = 6
     
     game_window = Toplevel()
     
     hangman = LabelFrame(game_window,width=600,height=200)
-    hangman.grid(row=0,column=0)
+    hangman.grid(row=0,column=0,rowspan=2)
+    
+    image_placeholder = Label(hangman,image=default_image)
+    image_placeholder.pack()
     
     upperframe = LabelFrame(game_window,width=600,height=200)
     upperframe.grid(row=0,column=1)
@@ -91,7 +120,7 @@ def play():
     
     
     keyboard = LabelFrame(game_window)
-    keyboard.grid(row=1,column=0)
+    keyboard.grid(row=1,column=1)
     for i in range(26):
         letter = chr(ord('a') + i)
         globals()["button_"+letter] = Button(keyboard,text=letter.upper(),command=lambda le = letter: wordcheck(le),width=5)
