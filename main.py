@@ -3,6 +3,7 @@ from PIL import ImageTk,Image
 import requests,json
 import random
 from tkinter import messagebox
+
 # from tkvideo
 
 root = Tk()
@@ -14,7 +15,7 @@ logo = ImageTk.PhotoImage(Image.open("icons/hangman.ico").resize((100,100)))
 top_frame = Frame(root)
 top_frame.pack(side="top", fill="both", expand=True)
 
-default_image = ImageTk.PhotoImage(Image.open("media/default.png").resize((200,200)))
+default_image = ImageTk.PhotoImage(Image.open("media/default.png").resize((360,300)))
 
 LogoWindow = Frame(top_frame,borderwidth=0)
 LogoWindow.pack(side="left")
@@ -40,20 +41,24 @@ def animate1(path):
     imageObject = [PhotoImage(file=path,format=f"gif -index {i}") for i in range(frames)]
     
     count = 0
-    
     showAnimation = None
-    animate2(count)
+    animate2(count,path)
     
     
-def animate2(count):
+def animate2(count,path):
     global showAnimation
     newImage = imageObject[count]
     
     image_placeholder.configure(image=newImage)
     count += 1
     
-    if count != frames:
-        showAnimation = root.after(50, lambda: animate2(count))
+    if path == "media/win.gif" or path == "media/loose.gif":
+        if count == frames:
+            count = 0
+            showAnimation = root.after(50, lambda: animate2(count,path))
+    else:
+        if count != frames:
+            showAnimation = root.after(50, lambda: animate2(count,path))
     
     
 def wordcheck(guessed_letter):
@@ -66,10 +71,12 @@ def wordcheck(guessed_letter):
         word_label.config(text=hidden_word)
         
         if "".join(hidden_word) == word:
+            animate1("media/win.gif")
             messagebox.showinfo("Congratulations","You guessed the word correctly!")
             game_window.destroy()
     else:
         if lives == 1:
+            animate1("media/loose.gif")
             messagebox.showerror("Game Over","All the Lives are lost!")
             game_window.destroy()
         animate1("media/"+str(6-(lives-1))+".gif")
