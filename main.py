@@ -3,6 +3,7 @@ from PIL import ImageTk,Image
 import requests,json
 import random
 from tkinter import messagebox
+import time
 
 # from tkvideo
 
@@ -55,7 +56,7 @@ def animate2(count,path):
     if path == "media/win.gif" or path == "media/loose.gif":
         if count == frames:
             count = 0
-            showAnimation = root.after(50, lambda: animate2(count,path))
+        showAnimation = root.after(50, lambda: animate2(count,path))
     else:
         if count != frames:
             showAnimation = root.after(50, lambda: animate2(count,path))
@@ -72,15 +73,16 @@ def wordcheck(guessed_letter):
         
         if "".join(hidden_word) == word:
             animate1("media/win.gif")
-            messagebox.showinfo("Congratulations","You guessed the word correctly!")
-            game_window.destroy()
+            # messagebox.showinfo("Congratulations","You guessed the word correctly!")
+            # game_window.destroy()
     else:
-        if lives == 1:
-            animate1("media/loose.gif")
-            messagebox.showerror("Game Over","All the Lives are lost!")
-            game_window.destroy()
-        animate1("media/"+str(6-(lives-1))+".gif")
         lives -= 1
+        if lives <= 0:
+            animate1("media/loose.gif")
+            # messagebox.showerror("Game Over","All the Lives are lost!")
+            # game_window.destroy()
+        else:
+            animate1("media/"+str(6-(lives-1))+".gif")
         lives_label.config(text="Lives: "+str(lives))
         
     
