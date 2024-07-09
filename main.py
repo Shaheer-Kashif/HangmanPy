@@ -3,7 +3,8 @@ from PIL import ImageTk,Image
 import requests,json
 import random
 from tkinter import messagebox
-import time
+import pygame
+import threading
 
 # from tkvideo
 
@@ -34,6 +35,16 @@ GameName.grid(row=0,column=0)
 Slogan = Label(LogoText,text="Can you save the poor soul?",font=("Montserrat",12))
 Slogan.grid(row=1,column=0)
 
+
+# Loading Sounds
+pygame.mixer.init()
+
+win_sound = pygame.mixer.Sound('media/win.wav')
+lose_sound = pygame.mixer.Sound('media/lose.wav')
+
+wrong_key_sound = pygame.mixer.Sound('media/wrong.wav')
+right_key_sound = pygame.mixer.Sound('media/right.wav')
+
 def animate1(path):
     global showAnimation,imageObject,frames
     openImage = Image.open(path)
@@ -61,17 +72,25 @@ def animate2(count,path):
         if count != frames:
             showAnimation = root.after(50, lambda: animate2(count,path))
     
+def soundplay(sound_type):
+    temp = pygame.mixer.Sound('media/'+sound_type+'.wav')
+    temp.play()
+        
     
 def wordcheck(guessed_letter):
     global lives,word,hidden_word,word_label,game_window
     globals()["button_"+guessed_letter].config(state=DISABLED)
     if guessed_letter in word:
+        t1 = threading.Thread(target=soundplay, args=('right',))
         for index,letter in enumerate(word):
             if guessed_letter==letter:
                 hidden_word[index] = word[index] 
         word_label.config(text=hidden_word)
         
         if "".join(hidden_word) == word:
+            t1 = threading.Thread(target=soundplay, args=('win',))
+            t1.start()
+            
             animate1("media/win.gif")
             # messagebox.showinfo("Congratulations","You guessed the word correctly!")
             # game_window.destroy()
@@ -79,9 +98,14 @@ def wordcheck(guessed_letter):
         lives -= 1
         if lives <= 0:
             animate1("media/loose.gif")
+            t1 = threading.Thread(target=soundplay, args=('lose',))
+            t1.start()
+            
             # messagebox.showerror("Game Over","All the Lives are lost!")
             # game_window.destroy()
         else:
+            t1 = threading.Thread(target=soundplay, args=('wrong',))
+            t1.start()
             animate1("media/"+str(6-(lives-1))+".gif")
         lives_label.config(text="Lives: "+str(lives))
         
