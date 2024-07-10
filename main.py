@@ -1,4 +1,5 @@
 from tkinter import *
+from tkinter import ttk
 from PIL import ImageTk,Image
 import requests,json
 import random
@@ -79,9 +80,10 @@ def soundplay(sound_type):
     
 def wordcheck(guessed_letter):
     global lives,word,hidden_word,word_label,game_window
-    globals()["button_"+guessed_letter].config(state=DISABLED)
+    globals()["button_"+guessed_letter].config(state=DISABLED,disabledforeground="white", bg="#96E0FF")
     if guessed_letter in word:
         t1 = threading.Thread(target=soundplay, args=('right',))
+        t1.start()
         for index,letter in enumerate(word):
             if guessed_letter==letter:
                 hidden_word[index] = word[index] 
@@ -152,12 +154,19 @@ def play():
     hint_label.grid(row=3,column=0)
     
     
-    keyboard = LabelFrame(game_window)
+    keyboard = LabelFrame(game_window,border=0)
     keyboard.grid(row=1,column=1)
+    temp = Button(keyboard,text="YO ",width=3,border=0,background="#27aae1",foreground="white",font="montserrat")
+    temp.grid(row=3,column=1)
+    
     for i in range(26):
         letter = chr(ord('a') + i)
-        globals()["button_"+letter] = Button(keyboard,text=letter.upper(),command=lambda le = letter: wordcheck(le),width=5)
-        globals()["button_"+letter].grid(row=i//7,column=i%7)
+        globals()["button_"+letter] = Button(keyboard,text=letter.upper(),command=lambda le = letter: wordcheck(le),width=3,border=0,background="#27aae1",foreground="white",font="montserrat")
+        
+        if i >= 21:
+            globals()["button_"+letter].grid(row=(i+1)//7,column=(i+1)%7,padx=5,pady=5)
+        else:
+            globals()["button_"+letter].grid(row=i//7,column=i%7,padx=5,pady=5)
     
     
     
