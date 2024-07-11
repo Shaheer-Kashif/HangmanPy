@@ -20,6 +20,10 @@ top_frame.pack(side="top", fill="both", expand=True)
 
 default_image = ImageTk.PhotoImage(Image.open("media/default.png").resize((360,300)))
 
+quit_button_image = ImageTk.PhotoImage(Image.open("media/icons/logout.png"))
+replay_button_image = ImageTk.PhotoImage(Image.open("media/icons/replay.png"))
+hint_image = ImageTk.PhotoImage(Image.open("media/icons/light-bulb.png"))
+
 LogoWindow = Frame(top_frame,borderwidth=0)
 LogoWindow.pack(side="left")
 
@@ -33,7 +37,7 @@ LogoText.pack(side="left")
 GameName = Label(LogoText,text="Hangman",font=("Bebas Neue",42))
 GameName.grid(row=0,column=0)
 
-Slogan = Label(LogoText,text="Can you save the poor soul?",font=("Montserrat",12))
+Slogan = Label(LogoText,text="Can you save the poor soul?",font=("Montserrat",11))
 Slogan.grid(row=1,column=0)
 
 
@@ -76,6 +80,14 @@ def animate2(count,path):
 def soundplay(sound_type):
     temp = pygame.mixer.Sound('media/'+sound_type+'.wav')
     temp.play()
+    
+def func_buttons(button_type):
+    if button_type == 'hint':
+        pass
+    elif button_type == 'replay':
+        pass
+    else:
+        game_window.destroy()
         
     
 def wordcheck(guessed_letter):
@@ -130,8 +142,8 @@ def play():
     
     game_window = Toplevel()
     
-    hangman = LabelFrame(game_window,width=600,height=200)
-    hangman.grid(row=0,column=0,rowspan=2)
+    hangman = LabelFrame(game_window,width=600,height=200,border=0)
+    hangman.grid(row=0,column=0,rowspan=3)
     
     image_placeholder = Label(hangman,image=default_image)
     image_placeholder.pack()
@@ -150,12 +162,23 @@ def play():
     lives_label = Label(upperframe,text="Lives: "+str(lives))
     lives_label.grid(row=2,column=0)
     
-    hint_label = Label(upperframe,text="Hint: "+hint)
-    hint_label.grid(row=3,column=0)
+    button_frame = LabelFrame(game_window,border=0)
+    button_frame.grid(row=1,column=1)
+    
+    hint_button = Button(button_frame,image=hint_image,border=0,command=lambda: func_buttons('hint'))
+    hint_button.grid(row=0,column=0,padx=10)
+    
+    replay_button = Button(button_frame,image=replay_button_image,border=0,command=lambda: func_buttons('replay'))
+    replay_button.grid(row=0,column=1,padx=10)
+    
+    quit_button = Button(button_frame,image=quit_button_image,border=0,command=lambda: func_buttons('quit'))
+    quit_button.grid(row=0,column=2,padx=10)
+    
+    #hint
     
     
     keyboard = LabelFrame(game_window,border=0)
-    keyboard.grid(row=1,column=1)
+    keyboard.grid(row=2,column=1)
     temp = Button(keyboard,text="YO ",width=3,border=0,background="#27aae1",foreground="white",font="montserrat")
     temp.grid(row=3,column=1)
     
