@@ -1,8 +1,7 @@
 from tkinter import *
-from tkinter import ttk
 from PIL import ImageTk,Image
 import requests,json
-import random
+import time
 from tkinter import messagebox
 import pygame
 import threading
@@ -25,23 +24,6 @@ replay_button_image = ImageTk.PhotoImage(Image.open("media/icons/replay.png"))
 hint_image = ImageTk.PhotoImage(Image.open("media/icons/light-bulb.png"))
 lives_image = ImageTk.PhotoImage(Image.open("media/icons/heart.png"))
 
-LogoWindow = Frame(top_frame,borderwidth=0)
-LogoWindow.pack(side="left")
-
-Logo = Label(LogoWindow, image=logo)
-Logo.grid(row=0,column=0,padx=15)
-
-
-LogoText = Frame(top_frame,borderwidth=0)
-LogoText.pack(side="left")
-
-GameName = Label(LogoText,text="Hangman",font=("Bebas Neue",42))
-GameName.grid(row=0,column=0)
-
-Slogan = Label(LogoText,text="Can you save the poor soul?",font=("Montserrat",11))
-Slogan.grid(row=1,column=0)
-
-
 # Loading Sounds
 pygame.mixer.init()
 
@@ -50,6 +32,7 @@ lose_sound = pygame.mixer.Sound('media/lose.wav')
 
 wrong_key_sound = pygame.mixer.Sound('media/wrong.wav')
 right_key_sound = pygame.mixer.Sound('media/right.wav')
+
 
 def animate1(path):
     global showAnimation,imageObject,frames
@@ -75,7 +58,7 @@ def animate2(count,path):
             count = 0
         showAnimation = root.after(50, lambda: animate2(count,path))
     else:
-        if count != frames:
+        if count < frames:
             showAnimation = root.after(50, lambda: animate2(count,path))
     
 def soundplay(sound_type):
@@ -83,10 +66,14 @@ def soundplay(sound_type):
     temp.play()
     
 def func_buttons(button_type):
+    global hint
     if button_type == 'hint':
-        pass
+        if len(hint) > 7:
+            hint = hint[0:7] + hint[7:].replace(" ","\n",1)
+        Label(button_frame,text=hint,height=3,font=("montserrat",10)).grid(row=0,column=0,padx=10)
     elif button_type == 'replay':
-        pass
+        game_window.destroy()
+        play()
     else:
         game_window.destroy()
         
@@ -103,18 +90,28 @@ def wordcheck(guessed_letter):
         word_label.config(text=hidden_word)
         
         if "".join(hidden_word) == word:
+            t2 = threading.Thread(target=animate1,args=("media/win.gif",))
+            t2.start()
             t1 = threading.Thread(target=soundplay, args=('win',))
             t1.start()
             
-            animate1("media/win.gif")
-            # messagebox.showinfo("Congratulations","You guessed the word correctly!")
-            # game_window.destroy()
+            time.sleep(2)
+            
+            response = messagebox.askyesno("You Won!","Would you like to Continue?")
+            if response == 1: 
+                game_window.destroy()
+                play()
+            else:
+                game_window.destroy()
     else:
         lives -= 1
         if lives <= 0:
-            animate1("media/loose.gif")
+            t2 = threading.Thread(target=animate1, args=("media/loose.gif",))
+            t2.start()
             t1 = threading.Thread(target=soundplay, args=('lose',))
             t1.start()
+            
+            time.sleep(2)
             
             # messagebox.showerror("Game Over","All the Lives are lost!")
             # game_window.destroy()
@@ -126,18 +123,14 @@ def wordcheck(guessed_letter):
         
     
 def play():
-    global lives,category,hidden_word,word,word_label,lives_text,game_window,keyboard,default_image,image_placeholder
+    global lives,category,hidden_word,word,word_label,lives_text,game_window,keyboard,default_image,image_placeholder,hint,hint_button,button_frame
     
-    category = requests.get("https://www.wordgamedb.com/api/v1/categories")
-    category = json.loads(category.content)
     
-    final_category = random.choice(category)
-    
-    api_req = requests.get("https://www.wordgamedb.com/api/v1/words/?category="+final_category)
+    api_req = requests.get("https://www.wordgamedb.com/api/v1/words/random")
     api = json.loads(api_req.content)
-    random_ele = random.randrange(len(api))
-    word = api[random_ele]['word']
-    hint = api[random_ele]['hint']
+    word = api['word']
+    hint = api['hint']
+    category = api['category']
     
     lives = 6
     
@@ -161,7 +154,7 @@ def play():
     category_frame.grid(row=2,column=0,columnspan=2)
     
     category_label = Label(category_frame,text="Category: ",font=("Montserrat",13,"bold"))
-    category_label2 = Label(category_frame,text=final_category,font=("Montserrat",12))
+    category_label2 = Label(category_frame,text=category,font=("Montserrat",12))
     
     category_label.grid(row=0,column=0)
     category_label2.grid(row=0,column=1)
@@ -187,12 +180,10 @@ def play():
     quit_button = Button(button_frame,image=quit_button_image,border=0,command=lambda: func_buttons('quit'))
     quit_button.grid(row=0,column=2,padx=10)
     
-    #hint
-    
-    
     keyboard = LabelFrame(game_window,border=0)
     keyboard.grid(row=2,column=1)
-    temp = Button(keyboard,text="YO ",width=3,border=0,background="#27aae1",foreground="white",font="montserrat")
+    
+    temp = Button(keyboard,text="  ",width=3,border=0,background="#27aae1",foreground="white",font="montserrat")
     temp.grid(row=3,column=1)
     
     for i in range(26):
@@ -206,9 +197,23 @@ def play():
     
     
     
+LogoWindow = Frame(top_frame,borderwidth=0)
+LogoWindow.pack(side="left")
+
+Logo = Label(LogoWindow, image=logo)
+Logo.grid(row=0,column=0,padx=15)
+
+
+LogoText = Frame(top_frame,borderwidth=0)
+LogoText.pack(side="left")
+
+GameName = Label(LogoText,text="Hangman",font=("Bebas Neue",42))
+GameName.grid(row=0,column=0)
+
+Slogan = Label(LogoText,text="Can you save the poor soul?",font=("Montserrat",11))
+Slogan.grid(row=1,column=0)
     
-
-
+    
 ButtonWindow = Frame(root,borderwidth=1)
 ButtonWindow.pack(fill="both", expand=True)
 
