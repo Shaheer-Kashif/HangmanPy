@@ -90,31 +90,33 @@ def wordcheck(guessed_letter):
         word_label.config(text=hidden_word)
         
         if "".join(hidden_word) == word:
-            t2 = threading.Thread(target=animate1,args=("media/win.gif",))
-            t2.start()
+            animate1("media/win.gif")
             t1 = threading.Thread(target=soundplay, args=('win',))
             t1.start()
             
-            time.sleep(2)
+            replay_text.config(text="Would you like to play again?",font=("Montserrat",12))
             
-            response = messagebox.askyesno("You Won!","Would you like to Continue?")
-            if response == 1: 
-                game_window.destroy()
-                play()
-            else:
-                game_window.destroy()
+            yes_button = Button(replay_menu,text="Yes",border=0,width=5,bg="#27e152",fg="white",command=lambda: func_buttons('replay'),font=("montserrat",16,"bold"))
+            yes_button.grid(row=1,column=0,pady=5)   
+            
+            no_button = Button(replay_menu,text="No",border=0,width=5,bg="#ff5757",fg="white",command=lambda: func_buttons('quit'),font=("montserrat",16,"bold"))
+            no_button.grid(row=1,column=1,pady=5)      
+            
     else:
         lives -= 1
         if lives <= 0:
-            t2 = threading.Thread(target=animate1, args=("media/loose.gif",))
-            t2.start()
+            animate1("media/loose.gif")
             t1 = threading.Thread(target=soundplay, args=('lose',))
             t1.start()
             
-            time.sleep(2)
+            replay_text.config(text="Would you like to play again?",font=("Montserrat",12))
             
-            # messagebox.showerror("Game Over","All the Lives are lost!")
-            # game_window.destroy()
+            yes_button = Button(replay_menu,text="Yes",border=0,width=5,bg="#27e152",fg="white",command=lambda: func_buttons('replay'),font=("montserrat",16,"bold"))
+            yes_button.grid(row=1,column=0,pady=5)   
+            
+            no_button = Button(replay_menu,text="No",border=0,width=5,bg="#ff5757",fg="white",command=lambda: func_buttons('quit'),font=("montserrat",16,"bold"))
+            no_button.grid(row=1,column=1,pady=5)      
+            
         else:
             t1 = threading.Thread(target=soundplay, args=('wrong',))
             t1.start()
@@ -123,8 +125,7 @@ def wordcheck(guessed_letter):
         
     
 def play():
-    global lives,category,hidden_word,word,word_label,lives_text,game_window,keyboard,default_image,image_placeholder,hint,hint_button,button_frame
-    
+    global lives,category,hidden_word,word,word_label,lives_text,game_window,keyboard,default_image,image_placeholder,hint,hint_button,button_frame,replay_menu,replay_text
     
     api_req = requests.get("https://www.wordgamedb.com/api/v1/words/random")
     api = json.loads(api_req.content)
@@ -183,6 +184,12 @@ def play():
     keyboard = LabelFrame(game_window,border=0)
     keyboard.grid(row=2,column=1)
     
+    replay_menu = LabelFrame(game_window,border=0)
+    replay_menu.grid(row=3,column=0,columnspan=2,pady=10)
+            
+    replay_text = Label(replay_menu)
+    replay_text.grid(row=0,column=0,columnspan=2)
+    
     temp = Button(keyboard,text="  ",width=3,border=0,background="#27aae1",foreground="white",font="montserrat")
     temp.grid(row=3,column=1)
     
@@ -217,7 +224,7 @@ Slogan.grid(row=1,column=0)
 ButtonWindow = Frame(root,borderwidth=1)
 ButtonWindow.pack(fill="both", expand=True)
 
-playbutton = Button(ButtonWindow,text="Play",font=("Montserrat",14,"bold"),command=play,width=25,background="#27e152",fg="white",borderwidth=0, relief='raised')
+playbutton = Button(ButtonWindow,text="Play",font=("Montserrat",14,"bold"),command=play,width=25,bg="#27e152",fg="white",borderwidth=0, relief='raised')
 playbutton.grid(row=0,column=0,columnspan=2,padx=(25,0),pady=(20,0))
 
 statsbutton = Button(ButtonWindow,text="Stats",font=("Montserrat",14,"bold"),width=25,background="#27aae1",fg="white",borderwidth=0, relief='raised')
