@@ -48,18 +48,23 @@ def animate1(path):
     
 def animate2(count,path):
     global showAnimation
-    newImage = imageObject[count]
-    
-    image_placeholder.configure(image=newImage)
-    count += 1
-    
-    if path == "media/win.gif" or path == "media/loose.gif":
-        if count == frames:
-            count = 0
-        showAnimation = root.after(50, lambda: animate2(count,path))
+    if path == "reset":
+        root.after_cancel(showAnimation)
+        image_placeholder.config(image=default_image)
     else:
-        if count < frames:
+        newImage = imageObject[count]
+        
+        image_placeholder.configure(image=newImage)
+        count += 1
+        
+        if path == "media/win.gif" or path == "media/loose.gif":
+            if count == frames:
+                count = 0
             showAnimation = root.after(50, lambda: animate2(count,path))
+        
+        else:
+            if count < frames:
+                showAnimation = root.after(50, lambda: animate2(count,path))
     
 def soundplay(sound_type):
     temp = pygame.mixer.Sound('media/'+sound_type+'.wav')
@@ -74,6 +79,7 @@ def func_buttons(button_type):
     elif button_type == 'replay':
         game_window.destroy()
         play()
+        animate2(2,"reset")
     else:
         game_window.destroy()
         
@@ -94,7 +100,7 @@ def wordcheck(guessed_letter):
             t1 = threading.Thread(target=soundplay, args=('win',))
             t1.start()
             
-            replay_text.config(text="Would you like to play again?",font=("Montserrat",12))
+            replay_text.config(text="You Win!, Would you like to play again?",font=("Montserrat",12))
             
             yes_button = Button(replay_menu,text="Yes",border=0,width=5,bg="#27e152",fg="white",command=lambda: func_buttons('replay'),font=("montserrat",16,"bold"))
             yes_button.grid(row=1,column=0,pady=5)   
@@ -109,7 +115,7 @@ def wordcheck(guessed_letter):
             t1 = threading.Thread(target=soundplay, args=('lose',))
             t1.start()
             
-            replay_text.config(text="Would you like to play again?",font=("Montserrat",12))
+            replay_text.config(text="You lose, The word was: "+word+"\nWould you like to play again?",font=("Montserrat",12))
             
             yes_button = Button(replay_menu,text="Yes",border=0,width=5,bg="#27e152",fg="white",command=lambda: func_buttons('replay'),font=("montserrat",16,"bold"))
             yes_button.grid(row=1,column=0,pady=5)   
@@ -125,7 +131,7 @@ def wordcheck(guessed_letter):
         
     
 def play():
-    global lives,category,hidden_word,word,word_label,lives_text,game_window,keyboard,default_image,image_placeholder,hint,hint_button,button_frame,replay_menu,replay_text
+    global lives,category,hidden_word,word,word_label,lives_text,game_window,keyboard,default_image,image_placeholder,hint,hint_button,button_frame,replay_menu,replay_text,word
     
     api_req = requests.get("https://www.wordgamedb.com/api/v1/words/random")
     api = json.loads(api_req.content)
