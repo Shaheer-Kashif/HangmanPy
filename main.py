@@ -149,7 +149,8 @@ def play():
     image_placeholder = Label(hangman,image=default_image)
     image_placeholder.pack()
     
-    upperframe = LabelFrame(game_window,width=800,height=300,padx=100,border=0)
+    upperframe = LabelFrame(game_window,width=350,height=100,padx=100,border=0)
+    upperframe.grid_propagate(0)
     upperframe.grid(row=0,column=1)
     
     hidden_word = ["_" for letter in word]
@@ -175,17 +176,18 @@ def play():
     lives_text = Label(lives_frame,text=lives,font=("Montserrat",12,"bold"))
     lives_text.grid(row=0,column=1)
     
-    button_frame = LabelFrame(game_window,border=0)
+    button_frame = LabelFrame(game_window,border=0,height=50,width=250)
+    button_frame.grid_propagate(0)
     button_frame.grid(row=1,column=1,pady=10)
     
     hint_button = Button(button_frame,image=hint_image,border=0,command=lambda: func_buttons('hint'))
-    hint_button.grid(row=0,column=0,padx=10)
+    hint_button.grid(row=0,column=0,padx=15)
     
     replay_button = Button(button_frame,image=replay_button_image,border=0,command=lambda: func_buttons('replay'))
-    replay_button.grid(row=0,column=1,padx=10)
+    replay_button.grid(row=0,column=1,padx=30)
     
     quit_button = Button(button_frame,image=quit_button_image,border=0,command=lambda: func_buttons('quit'))
-    quit_button.grid(row=0,column=2,padx=10)
+    quit_button.grid(row=0,column=2,padx=15)
     
     keyboard = LabelFrame(game_window,border=0)
     keyboard.grid(row=2,column=1)
