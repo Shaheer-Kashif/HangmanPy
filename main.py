@@ -177,17 +177,16 @@ def play():
     lives_text.grid(row=0,column=1)
     
     button_frame = LabelFrame(game_window,border=0,height=50,width=250)
-    button_frame.grid_propagate(0)
     button_frame.grid(row=1,column=1,pady=10)
     
-    hint_button = Button(button_frame,image=hint_image,border=0,command=lambda: func_buttons('hint'))
-    hint_button.grid(row=0,column=0,padx=15)
+    hint_button = Button(button_frame,image=hint_image,border=0,command=lambda: func_buttons('hint'), height=50)
+    hint_button.grid(row=0,column=0,padx=10)
     
     replay_button = Button(button_frame,image=replay_button_image,border=0,command=lambda: func_buttons('replay'))
-    replay_button.grid(row=0,column=1,padx=30)
+    replay_button.grid(row=0,column=1,padx=10)
     
     quit_button = Button(button_frame,image=quit_button_image,border=0,command=lambda: func_buttons('quit'))
-    quit_button.grid(row=0,column=2,padx=15)
+    quit_button.grid(row=0,column=2,padx=10)
     
     keyboard = LabelFrame(game_window,border=0)
     keyboard.grid(row=2,column=1)
