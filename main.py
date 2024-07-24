@@ -1,15 +1,14 @@
 from tkinter import *
 from PIL import ImageTk,Image
 import requests,json
-import time
-from tkinter import messagebox
 import pygame
 import threading
-
-# from tkvideo
+from tkinter import messagebox
 
 root = Tk()
 root.title("Hangman")
+
+# Loading Relevant Images
 root.iconbitmap("icons/hangman.ico")
 
 logo = ImageTk.PhotoImage(Image.open("icons/hangman.ico").resize((100,100)))
@@ -34,6 +33,7 @@ wrong_key_sound = pygame.mixer.Sound('media/wrong.wav')
 right_key_sound = pygame.mixer.Sound('media/right.wav')
 
 
+# Animation Player of Gifs
 def animate1(path):
     global showAnimation,imageObject,frames
     openImage = Image.open(path)
@@ -44,7 +44,6 @@ def animate1(path):
     count = 0
     showAnimation = None
     animate2(count,path)
-    
     
 def animate2(count,path):
     global showAnimation
@@ -66,10 +65,12 @@ def animate2(count,path):
             if count < frames:
                 showAnimation = root.after(50, lambda: animate2(count,path))
     
+# Sound Playing Function
 def soundplay(sound_type):
     temp = pygame.mixer.Sound('media/'+sound_type+'.wav')
     temp.play()
     
+# Game Function Buttons
 def func_buttons(button_type):
     global hint
     if button_type == 'hint':
@@ -83,7 +84,8 @@ def func_buttons(button_type):
     else:
         game_window.destroy()
         
-    
+
+# Game Logic
 def wordcheck(guessed_letter):
     global lives,word,hidden_word,word_label,game_window
     globals()["button_"+guessed_letter].config(state=DISABLED,disabledforeground="white", bg="#96E0FF")
@@ -129,11 +131,16 @@ def wordcheck(guessed_letter):
             animate1("media/"+str(6-(lives-1))+".gif")
         lives_text.config(text=lives)
         
-    
+
+# Main Screen Load
 def play():
     global lives,category,hidden_word,word,word_label,lives_text,game_window,keyboard,default_image,image_placeholder,hint,hint_button,button_frame,replay_menu,replay_text,word
-    
-    api_req = requests.get("https://www.wordgamedb.com/api/v1/words/random")
+    try:
+        api_req = requests.get("https://www.wordgamedb.com/api/v1/words/random")
+    except:
+        messagebox.showerror("Error","There was an issue launching the application, maybe check your Internet.")
+        exit()
+        
     api = json.loads(api_req.content)
     word = api['word']
     hint = api['hint']
