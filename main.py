@@ -32,6 +32,8 @@ lose_sound = pygame.mixer.Sound('media/lose.wav')
 wrong_key_sound = pygame.mixer.Sound('media/wrong.wav')
 right_key_sound = pygame.mixer.Sound('media/right.wav')
 
+button_press = pygame.mixer.Sound('media/button_press.mp3')
+
 
 # Animation Player of Gifs
 def animate1(path):
@@ -65,14 +67,31 @@ def animate2(count,path):
             if count < frames:
                 showAnimation = root.after(50, lambda: animate2(count,path))
     
-# Sound Playing Function
+# Background Music Playing Function
+def bgmusic(event):
+    global channel,bg_music
+    try:
+        if channel.get_busy():
+            pass
+        else:
+            channel = bgmusic.play()
+    except:
+        bg_music = pygame.mixer.Sound('media/bg-music.mp3')
+        channel = bg_music.play()
+    if event == "main":
+        bg_music.set_volume(.25)
+    elif event=="in_game":
+        bg_music.set_volume(.05)
+  
+# Certain SFX Playing Function  
 def soundplay(sound_type):
-    temp = pygame.mixer.Sound('media/'+sound_type+'.wav')
-    temp.play()
+    sfx = pygame.mixer.Sound('media/'+sound_type+'.wav')
+    sfx.play()
     
 # Game Function Buttons
 def func_buttons(button_type):
     global hint
+    button_press.play()
     if button_type == 'hint':
         if len(hint) > 7:
             hint = hint[0:7] + hint[7:].replace(" ","\n",1)
@@ -141,6 +160,7 @@ def play():
         messagebox.showerror("Error","There was an issue launching the application, maybe check your Internet.")
         exit()
         
+    bgmusic("in_game") 
     api = json.loads(api_req.content)
     word = api['word']
     hint = api['hint']
@@ -216,8 +236,15 @@ def play():
         else:
             globals()["button_"+letter].grid(row=i//7,column=i%7,padx=5,pady=5)
     
+def main_buttons(type):
+    button_press.play()
+    if type == "play":
+        play()
+    
+
     
     
+# Main Menu
 LogoWindow = Frame(top_frame,borderwidth=0)
 LogoWindow.pack(side="left")
 
@@ -238,7 +265,7 @@ Slogan.grid(row=1,column=0)
 ButtonWindow = Frame(root,borderwidth=1)
 ButtonWindow.pack(fill="both", expand=True)
 
-playbutton = Button(ButtonWindow,text="Play",font=("Montserrat",14,"bold"),command=play,width=25,bg="#27e152",fg="white",borderwidth=0, relief='raised')
+playbutton = Button(ButtonWindow,text="Play",font=("Montserrat",14,"bold"),command= lambda: main_buttons("play"),width=25,bg="#27e152",fg="white",borderwidth=0, relief='raised')
 playbutton.grid(row=0,column=0,columnspan=2,padx=(25,0),pady=(20,0))
 
 statsbutton = Button(ButtonWindow,text="Stats",font=("Montserrat",14,"bold"),width=25,background="#27aae1",fg="white",borderwidth=0, relief='raised')
@@ -250,6 +277,6 @@ settings.grid(row=2,column=0,padx=(21,0),pady=10)
 quit = Button(ButtonWindow,text="Quit",command=quit,font=("Montserrat",14,"bold"),width=11,background="#ff5757",fg="white",borderwidth=0, relief='raised')
 quit.grid(row=2,column=1,padx=(12,0),pady=10)
 
-
+bgmusic("main") 
 
 root.mainloop()
