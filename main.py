@@ -4,6 +4,7 @@ import requests,json
 import pygame
 import threading
 from tkinter import messagebox
+from os import remove
 
 root = Tk()
 root.title("Hangman")
@@ -34,7 +35,33 @@ right_key_sound = pygame.mixer.Sound('media/right.wav')
 
 button_press = pygame.mixer.Sound('media/button_press.mp3')
 
+# Stats Files and Variables
+try:
+    s1 = open("stats.txt","r")
+    stats = s1.readlines()[0]
+    win,loss,right,wrong = stats.split(",")
+    win = int(win)
+    loss = int(loss)
+    right = int(right)
+    wrong = int(wrong)
+except Exception:
+    win = 0
+    loss = 0
+    right = 0
+    wrong = 0
+    s1 = open("stats.txt","w")
+    s1.write(str(win)+","+ str(loss)+","+ str(right)+","+ str(wrong))
+    s1.flush()
 
+# Stats Update
+def stats_update():
+    global win,loss,right,wrong,s1
+    s1.close()
+    remove("stats.txt")
+    s1 = open("stats.txt","w")
+    s1.write(str(win)+","+ str(loss)+","+ str(right)+","+ str(wrong))
+    s1.flush()
+    
 # Animation Player of Gifs
 def animate1(path):
     global showAnimation,imageObject,frames
@@ -79,18 +106,20 @@ def bgmusic(event):
         bg_music = pygame.mixer.Sound('media/bg-music.mp3')
         channel = bg_music.play()
     if event == "main":
-        bg_music.set_volume(.25)
+        bg_music.set_volume(.2)
     elif event=="in_game":
         bg_music.set_volume(.05)
   
 # Certain SFX Playing Function  
 def soundplay(sound_type):
     sfx = pygame.mixer.Sound('media/'+sound_type+'.wav')
+    sfx.set_volume(0.7)
     sfx.play()
     
 # Game Function Buttons
 def func_buttons(button_type):
     global hint
+    stats_update()
     button_press.play()
     if button_type == 'hint':
         if len(hint) > 7:
@@ -106,9 +135,10 @@ def func_buttons(button_type):
 
 # Game Logic
 def wordcheck(guessed_letter):
-    global lives,word,hidden_word,word_label,game_window
+    global lives,word,hidden_word,word_label,game_window,win,loss,right,wrong
     globals()["button_"+guessed_letter].config(state=DISABLED,disabledforeground="white", bg="#96E0FF")
     if guessed_letter in word:
+        right += 1
         t1 = threading.Thread(target=soundplay, args=('right',))
         t1.start()
         for index,letter in enumerate(word):
@@ -117,7 +147,9 @@ def wordcheck(guessed_letter):
         word_label.config(text=hidden_word)
         
         if "".join(hidden_word) == word:
+            
             animate1("media/win.gif")
+            win += 1
             t1 = threading.Thread(target=soundplay, args=('win',))
             t1.start()
             
@@ -127,12 +159,16 @@ def wordcheck(guessed_letter):
             yes_button.grid(row=1,column=0,pady=5)   
             
             no_button = Button(replay_menu,text="No",border=0,width=5,bg="#ff5757",fg="white",command=lambda: func_buttons('quit'),font=("montserrat",16,"bold"))
-            no_button.grid(row=1,column=1,pady=5)      
+            no_button.grid(row=1,column=1,pady=5)   
+            
+            stats_update()   
             
     else:
         lives -= 1
         if lives <= 0:
             animate1("media/loose.gif")
+            wrong += 1
+            loss += 1
             t1 = threading.Thread(target=soundplay, args=('lose',))
             t1.start()
             
@@ -144,7 +180,10 @@ def wordcheck(guessed_letter):
             no_button = Button(replay_menu,text="No",border=0,width=5,bg="#ff5757",fg="white",command=lambda: func_buttons('quit'),font=("montserrat",16,"bold"))
             no_button.grid(row=1,column=1,pady=5)      
             
+            stats_update()
+            
         else:
+            wrong += 1
             t1 = threading.Thread(target=soundplay, args=('wrong',))
             t1.start()
             animate1("media/"+str(6-(lives-1))+".gif")
@@ -235,11 +274,28 @@ def play():
             globals()["button_"+letter].grid(row=(i+1)//7,column=(i+1)%7,padx=5,pady=5)
         else:
             globals()["button_"+letter].grid(row=i//7,column=i%7,padx=5,pady=5)
+
+def stats_menu():
+    stats_window = Toplevel()
     
+    win_label = Label(stats_window,text="Wins: "+str(win))
+    win_label.grid(row=0,column=0)
+    
+    lose_label = Label(stats_window,text="Loses: "+str(loss))
+    lose_label.grid(row=1,column=0)
+    
+    right_label = Label(stats_window,text="Right Guesses: "+str(right))
+    right_label.grid(row=2,column=0)
+    
+    wrong_label = Label(stats_window,text="Wrong Guesses: "+str(wrong))
+    wrong_label.grid(row=3,column=0)
+
 def main_buttons(type):
     button_press.play()
     if type == "play":
         play()
+    elif type == "stats":
+        stats_menu()
     
 
     
@@ -268,7 +324,7 @@ ButtonWindow.pack(fill="both", expand=True)
 playbutton = Button(ButtonWindow,text="Play",font=("Montserrat",14,"bold"),command= lambda: main_buttons("play"),width=25,bg="#27e152",fg="white",borderwidth=0, relief='raised')
 playbutton.grid(row=0,column=0,columnspan=2,padx=(25,0),pady=(20,0))
 
-statsbutton = Button(ButtonWindow,text="Stats",font=("Montserrat",14,"bold"),width=25,background="#27aae1",fg="white",borderwidth=0, relief='raised')
+statsbutton = Button(ButtonWindow,text="Stats",font=("Montserrat",14,"bold"),command= lambda: main_buttons("stats"), width=25,background="#27aae1",fg="white",borderwidth=0, relief='raised')
 statsbutton.grid(row=1,column=0,columnspan=2,padx=(25,0),pady=(10,0))
 
 settings = Button(ButtonWindow,text="Settings",font=("Montserrat",14,"bold"),width=12,background="#27aae1",fg="white",borderwidth=0, relief='raised')
