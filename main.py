@@ -276,19 +276,34 @@ def play():
             globals()["button_"+letter].grid(row=i//7,column=i%7,padx=5,pady=5)
 
 def stats_menu():
-    stats_window = Toplevel()
+    stats_window = Toplevel(padx=10,pady=10)
     
-    win_label = Label(stats_window,text="Wins: "+str(win))
-    win_label.grid(row=0,column=0)
+    heading = Label(stats_window,text="All Time Stats",font=("Montserrat",20,"bold"),foreground="#27aae1")
+    heading.grid(row=0,column=0,columnspan=2)
     
-    lose_label = Label(stats_window,text="Loses: "+str(loss))
-    lose_label.grid(row=1,column=0)
+    win_label = Label(stats_window,text="Wins:",font=("Montserrat",12))
+    win_label.grid(row=1,column=0,sticky="w")
     
-    right_label = Label(stats_window,text="Right Guesses: "+str(right))
-    right_label.grid(row=2,column=0)
+    win_label2 = Label(stats_window,text=str(win),font=("Montserrat",15,"bold"))
+    win_label2.grid(row=1,column=1,sticky="e")
     
-    wrong_label = Label(stats_window,text="Wrong Guesses: "+str(wrong))
-    wrong_label.grid(row=3,column=0)
+    lose_label = Label(stats_window,text="Loses:",font=("Montserrat",12))
+    lose_label.grid(row=2,column=0,sticky="w")
+    
+    lose_label = Label(stats_window,text=str(loss),font=("Montserrat",15,"bold"))
+    lose_label.grid(row=2,column=1,sticky="e")
+    
+    right_label = Label(stats_window,text="Right Guesses:",font=("Montserrat",12))
+    right_label.grid(row=3,column=0,sticky="w")
+    
+    right_label2 = Label(stats_window,text=str(right),font=("Montserrat",15,"bold"))
+    right_label2.grid(row=3,column=1,sticky="e")
+    
+    wrong_label = Label(stats_window,text="Wrong Guesses:",font=("Montserrat",12))
+    wrong_label.grid(row=4,column=0,sticky="w")
+    
+    wrong_label = Label(stats_window,text=str(wrong),font=("Montserrat",15,"bold"))
+    wrong_label.grid(row=4,column=1,sticky="e")
 
 def main_buttons(type):
     button_press.play()
