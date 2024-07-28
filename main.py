@@ -1,8 +1,7 @@
 from tkinter import *
 from PIL import ImageTk,Image
 import requests,json
-import pygame
-import threading
+import pygame, threading, time
 from tkinter import messagebox
 from os import remove
 
@@ -62,6 +61,22 @@ def stats_update():
     s1.write(str(win)+","+ str(loss)+","+ str(right)+","+ str(wrong))
     s1.flush()
     
+# Music Properties
+bg_music = pygame.mixer.Sound('media/bg-music.mp3')
+    
+# defining variables for transition
+initial_volume = 0.2
+final_volume = 0.05
+fade_duration = 2  # 3 seconds
+steps = 100
+step_duration = fade_duration / steps
+transition_game = False
+transition_menu = False
+
+bg_music.set_volume(initial_volume)
+bg_music.play()
+
+    
 # Animation Player of Gifs
 def animate1(path):
     global showAnimation,imageObject,frames
@@ -94,22 +109,7 @@ def animate2(count,path):
             if count < frames:
                 showAnimation = root.after(50, lambda: animate2(count,path))
     
-# Background Music Playing Function
-def bgmusic(event):
-    global channel,bg_music
-    try:
-        if channel.get_busy():
-            pass
-        else:
-            channel = bgmusic.play()
-    except:
-        bg_music = pygame.mixer.Sound('media/bg-music.mp3')
-        channel = bg_music.play()
-    if event == "main":
-        bg_music.set_volume(.2)
-    elif event=="in_game":
-        bg_music.set_volume(.05)
-  
+          
 # Certain SFX Playing Function  
 def soundplay(sound_type):
     sfx = pygame.mixer.Sound('media/'+sound_type+'.wav')
@@ -192,14 +192,13 @@ def wordcheck(guessed_letter):
 
 # Main Screen Load
 def play():
-    global lives,category,hidden_word,word,word_label,lives_text,game_window,keyboard,default_image,image_placeholder,hint,hint_button,button_frame,replay_menu,replay_text,word
+    global game_window,lives,category,hidden_word,word,word_label,lives_text,game_window,keyboard,default_image,image_placeholder,hint,hint_button,button_frame,replay_menu,replay_text,word
     try:
         api_req = requests.get("https://www.wordgamedb.com/api/v1/words/random")
     except:
         messagebox.showerror("Error","There was an issue launching the application, maybe check your Internet.")
         exit()
         
-    bgmusic("in_game") 
     api = json.loads(api_req.content)
     word = api['word']
     hint = api['hint']
@@ -208,6 +207,9 @@ def play():
     lives = 6
     
     game_window = Toplevel()
+    
+    mus_check = threading.Thread(target=eventcheckbgmusic)
+    mus_check.start()
     
     hangman = LabelFrame(game_window,width=600,height=200,border=0)
     hangman.grid(row=0,column=0,rowspan=3)
@@ -274,7 +276,34 @@ def play():
             globals()["button_"+letter].grid(row=(i+1)//7,column=(i+1)%7,padx=5,pady=5)
         else:
             globals()["button_"+letter].grid(row=i//7,column=i%7,padx=5,pady=5)
+            
+# Background Music Playing Function
+def eventcheckbgmusic():
+    global game_window,transition_game,transition_menu
+    
+    while True:
+        if game_window.winfo_exists():
+            if transition_game == False:
+                for step in range(steps):
+                    new_volume = initial_volume - (initial_volume - final_volume) * (step + 1) / steps
+                    bg_music.set_volume(new_volume)
+                    time.sleep(step_duration)
+                transition_game = True
+                transition_menu = False
+        else:
+            if transition_menu == False:
+                for step in range(steps):
+                    new_volume = final_volume - (final_volume - initial_volume) * (step + 1) / steps
+                    bg_music.set_volume(new_volume)
+                    time.sleep(step_duration)
+                
+                transition_menu = True
+                transition_game = False
+        time.sleep(.1)
+    
+        
 
+# Stats Menu
 def stats_menu():
     stats_window = Toplevel(padx=10,pady=10)
     
@@ -348,6 +377,5 @@ settings.grid(row=2,column=0,padx=(21,0),pady=10)
 quit = Button(ButtonWindow,text="Quit",command=quit,font=("Montserrat",14,"bold"),width=11,background="#ff5757",fg="white",borderwidth=0, relief='raised')
 quit.grid(row=2,column=1,padx=(12,0),pady=10)
 
-bgmusic("main") 
 
 root.mainloop()
