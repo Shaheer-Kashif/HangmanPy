@@ -6,6 +6,7 @@ from tkinter import messagebox
 from os import remove
 
 root = Tk()
+root.config(padx=10)
 root.title("Hangman")
 
 # Loading Relevant Images
@@ -192,7 +193,20 @@ def wordcheck(guessed_letter):
 
 # Main Screen Load
 def play():
-    global game_window,lives,category,hidden_word,word,word_label,lives_text,game_window,keyboard,default_image,image_placeholder,hint,hint_button,button_frame,replay_menu,replay_text,word
+    global game_window,credits_window,stats_window,lives,category,hidden_word,word,word_label,lives_text,game_window,keyboard,default_image,image_placeholder,hint,hint_button,button_frame,replay_menu,replay_text,word
+    try:
+        if stats_window.winfo_exists():
+            stats_window.destroy()
+        if credits_window.winfo_exists():
+            credits_window.destroy()
+    except:
+        try:
+            if credits_window.winfo_exists():
+                credits_window.destroy()
+        except:
+            pass
+        pass
+    
     try:
         api_req = requests.get("https://www.wordgamedb.com/api/v1/words/random")
     except:
@@ -305,6 +319,7 @@ def eventcheckbgmusic():
 
 # Stats Menu
 def stats_menu():
+    global stats_window
     stats_window = Toplevel(padx=10,pady=10)
     
     heading = Label(stats_window,text="All Time Stats",font=("Montserrat",20,"bold"),foreground="#27aae1")
@@ -334,12 +349,24 @@ def stats_menu():
     wrong_label = Label(stats_window,text=str(wrong),font=("Montserrat",15,"bold"))
     wrong_label.grid(row=4,column=1,sticky="e")
 
+def credits_menu():
+    global credits_window
+    credits_window = Toplevel(padx=10,pady=10)
+    
+    heading = Label(credits_window,text="Made By",font=("Montserrat",20,"bold"),foreground="#27aae1")
+    heading.grid(row=0,column=0,columnspan=2)
+    
+    name_label = Label(credits_window,text="Shaheer Codes",font=("Montserrat",24))
+    name_label.grid(row=1,column=0)
+    
 def main_buttons(type):
     button_press.play()
     if type == "play":
         play()
     elif type == "stats":
         stats_menu()
+    elif type == "credits":
+        credits_menu()
     
 
     
@@ -355,7 +382,7 @@ Logo.grid(row=0,column=0,padx=15)
 LogoText = Frame(top_frame,borderwidth=0)
 LogoText.pack(side="left")
 
-GameName = Label(LogoText,text="Hangman",font=("Bebas Neue",42))
+GameName = Label(LogoText,text="Hangman",font=("Montserrat",31))
 GameName.grid(row=0,column=0)
 
 Slogan = Label(LogoText,text="Can you save the poor soul?",font=("Montserrat",11))
@@ -371,11 +398,11 @@ playbutton.grid(row=0,column=0,columnspan=2,padx=(25,0),pady=(20,0))
 statsbutton = Button(ButtonWindow,text="Stats",font=("Montserrat",14,"bold"),command= lambda: main_buttons("stats"), width=25,background="#27aae1",fg="white",borderwidth=0, relief='raised')
 statsbutton.grid(row=1,column=0,columnspan=2,padx=(25,0),pady=(10,0))
 
-settings = Button(ButtonWindow,text="Settings",font=("Montserrat",14,"bold"),width=12,background="#27aae1",fg="white",borderwidth=0, relief='raised')
-settings.grid(row=2,column=0,padx=(21,0),pady=10)
+settings = Button(ButtonWindow,text="Credits",font=("Montserrat",14,"bold"),command= lambda: main_buttons("credits"),width=12,background="#27aae1",fg="white",borderwidth=0, relief='raised')
+settings.grid(row=2,column=0,padx=(24,0),pady=10)
 
 quit = Button(ButtonWindow,text="Quit",command=quit,font=("Montserrat",14,"bold"),width=11,background="#ff5757",fg="white",borderwidth=0, relief='raised')
-quit.grid(row=2,column=1,padx=(12,0),pady=10)
+quit.grid(row=2,column=1,padx=(14,0),pady=10)
 
 
 root.mainloop()
