@@ -4,6 +4,7 @@ import requests,json
 import pygame, threading, time
 from tkinter import messagebox
 from os import remove
+from sys import exit
 
 root = Tk()
 root.config(padx=10)
@@ -454,7 +455,7 @@ statsbutton.grid(row=1,column=0,columnspan=2,padx=(25,0),pady=(10,0))
 settings = Button(ButtonWindow,text="Credits",font=("Montserrat",14,"bold"),command= lambda: main_buttons("credits"),width=12,background="#27aae1",fg="white",borderwidth=0, relief='raised')
 settings.grid(row=2,column=0,padx=(24,0),pady=10)
 
-quit = Button(ButtonWindow,text="Quit",command=quit,font=("Montserrat",14,"bold"),width=11,background="#ff5757",fg="white",borderwidth=0, relief='raised')
+quit = Button(ButtonWindow,text="Quit",command=exit,font=("Montserrat",14,"bold"),width=11,background="#ff5757",fg="white",borderwidth=0, relief='raised')
 quit.grid(row=2,column=1,padx=(14,0),pady=10)
 
 
